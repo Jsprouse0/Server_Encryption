@@ -1,3 +1,5 @@
+# Robert Gleason and Jacob Sprouse
+
 import socket
 
 # create socket object
