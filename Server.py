@@ -1,3 +1,5 @@
+# Robert Gleason and Jacob Sprouse
+
 import socket
 
 # Creates a socket object that listens
