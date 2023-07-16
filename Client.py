@@ -1,6 +1,6 @@
 # Robert Gleason and Jacob Sprouse
 import socket
-from Server import Socket
+from Server import Socket, Cipher
 from Cryptodome.Cipher import AES
 from Cryptodome.Random import get_random_bytes
 from Cryptodome.Util.Padding import pad, unpad
@@ -9,34 +9,50 @@ from Cryptodome.Util.Padding import pad, unpad
 connectionSocket = Socket.server()
 host = Socket.host()
 port = Socket.port()
-
-key = get_random_bytes(16)
-connection = True
 connectionSocket.connect((host, port))
+connection = True
+cipher_mode = input('Input a mode my boi: \n')
+
+key_type = int(input('Input a key: \n'))
+key = Cipher.cipher_key(key_type)
+
 
 while connection:
-    # Client message
-    message = input()
-    message_encode = message.encode()
+    # Client message_input
+    connectionSocket.send(cipher_mode.encode())
+    message = input('Input a message my boi: \n')
 
-    # encryption key
-    encrypt_cipher = AES.new(key, AES.MODE_ECB)
-    ciphertext = encrypt_cipher.encrypt(pad(message_encode, AES.block_size))
-    print(ciphertext)
+    iv = get_random_bytes(AES.block_size)
 
-    # sends message across socket to server
-    connectionSocket.send(ciphertext)
-    connectionSocket.send(key)
+    # Cipher mode check
+    match cipher_mode:
+        case 'ECB':
+            encrypt_text = Cipher.encryption_ecb(key, message)
 
-    # Server Response
-    received_ciphertext = connectionSocket.recv(1024)
-    decrypt_cipher = AES.new(key, AES.MODE_ECB)
-    decrypt_bytes = unpad(decrypt_cipher.decrypt(received_ciphertext), AES.block_size)
+            # sends message_input across socket to server
+            connectionSocket.send(key)
+            connectionSocket.send(encrypt_text)
 
-    received_message = bytes.decode(decrypt_bytes)
+            # Server Response
+            received_server_message = connectionSocket.recv(1024)
+            received_message = Cipher.decryption_ecb(key, received_server_message)
 
-    print(f"The cipher text is {received_ciphertext} and the message is {received_message}")
+        case 'CBC':
+            encrypt_text = Cipher.encryption_cbc(key, message, iv)
 
-    if received_message == 'Bye' or received_message == 'bye':
+            # sends message_input across socket to server
+            connectionSocket.send(key)
+            connectionSocket.send(encrypt_text)
+            connectionSocket.send(iv)
+
+            # Server Response
+            received_server_message = connectionSocket.recv(1024)
+            decrypt_response = Cipher.decryption_cbc(key, received_server_message, iv)
+
+    print(encrypt_text)
+
+    print(f"The cipher text is: {received_server_message}\nAnd the message is: {decrypt_response}")
+
+    if decrypt_response == 'Bye' or decrypt_response == 'bye':
         connectionSocket.close()
         connection = False
