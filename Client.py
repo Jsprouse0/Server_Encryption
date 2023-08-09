@@ -1,10 +1,10 @@
 # Robert Gleason and Jacob Sprouse
-# Version 4
-import socket
-from Server import Socket, Cipher
+# Version 5
+
+import time
 from Cryptodome.Cipher import AES
 from Cryptodome.Random import get_random_bytes
-from Cryptodome.Util.Padding import pad, unpad
+from Classes import Socket, Cipher
 
 # create socket object
 connectionSocket = Socket.server()
@@ -22,6 +22,7 @@ while connection:
     # Client message_input
     connectionSocket.send(cipher_mode.encode())
     message = input('Input a message my boi: \n')
+    print(message)
 
     iv = get_random_bytes(AES.block_size)
 
@@ -44,11 +45,24 @@ while connection:
             # sends message_input across socket to server
             connectionSocket.send(key)
             connectionSocket.send(encrypt_text)
+            time.sleep(0.2)
             connectionSocket.send(iv)
 
             # Server Response
             received_server_message = connectionSocket.recv(1024)
             decrypt_response = Cipher.decryption_cbc(key, received_server_message, iv)
+        case 'OFB':
+            encrypt_text = Cipher.encryption_ofb(key, message, iv)
+
+            # sends message_input across socket to server
+            connectionSocket.send(key)
+            connectionSocket.send(encrypt_text)
+            time.sleep(0.2)
+            connectionSocket.send(iv)
+
+            # Server Response
+            received_server_message = connectionSocket.recv(1024)
+            decrypt_response = Cipher.decryption_ofb(key, received_server_message, iv)
 
     print(encrypt_text)
 
