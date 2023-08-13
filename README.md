@@ -7,3 +7,7 @@ The client uses the same 3 AES modes as the server and will send and receive mes
 
 PROJECT:
 This project is to show cryptography encryption across a server and client. The private and public keys created by the project are for showing that it works by creating and using said key, it also is to show how the key is made from the server/client.
+
+
+NOTE:
+In an actual secure setting, the keys would not be shown; this is for demonstration purposes, so it is easier to understand where the RSA keys are created and pulled from.
