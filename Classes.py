@@ -1,5 +1,5 @@
 # Robert Gleason and Jacob Sprouse
-# version 5
+# version 6
 
 import socket
 from Cryptodome.Util.Padding import pad, unpad
