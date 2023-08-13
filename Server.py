@@ -1,6 +1,6 @@
 # Robert Gleason and Jacob Sprouse
 # Version 5
-from Classes import Socket, Cipher
+from Classes import Socket, Cipher, Signature
 
 
 if __name__ == '__main__':
@@ -25,6 +25,11 @@ if __name__ == '__main__':
     client_socket, addr_port = server_socket.accept()
 
     print("\nGot a connection from " + str(addr_port))
+
+    """ Creates RSA key for server"""
+    rsa_key = Signature.generate_rsa_key()
+    rsa_server_private_key = Signature.generate_private_key(rsa_key, "Server_private_key.pem")
+    rsa_server_public_key = Signature.generate_public_key(rsa_key, "Server_public_key.pem")
 
     while True:
         # Client response, Cipher mode, the key, and message

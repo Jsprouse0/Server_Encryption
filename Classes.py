@@ -5,6 +5,8 @@ import socket
 from Cryptodome.Util.Padding import pad, unpad
 from Cryptodome.Random import get_random_bytes
 from Cryptodome.Cipher import AES
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP
 
 
 class Socket(object):
@@ -80,3 +82,34 @@ class Cipher(object):
         decrypt_ciphertext = decrypt_cipher_bytes.decrypt(received_message)
         received_message = bytes.decode(decrypt_ciphertext)
         return received_message
+
+
+class Signature(object):
+    @staticmethod
+    def generate_rsa_key():
+        """ Generate RSA key """
+        key = RSA.generate(2048)
+        return key
+
+    @staticmethod
+    def generate_private_key(key, file_name):
+        """ Generate Private key """
+        private_key = key.export_key()
+        file_out = open(file_name, 'wb')
+        file_out.write(private_key)
+        file_out.close()
+        return private_key
+
+    @staticmethod
+    def generate_public_key(key, file_name):
+        public_key = key.publickey().export_key()
+        file_out = open(file_name, 'wb')
+        file_out.write(public_key)
+        file_out.close()
+        return public_key
+
+    @staticmethod
+    def encrypt_pk(pk, message):
+        pk_cipher = PKCS1_OAEP.new(pk)
+        pk_cipher.encrypt(message)
+        return pk_cipher
