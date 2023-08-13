@@ -3,3 +3,7 @@ The server encryption uses 3 AES modes, ECB, CBC, and OFB. To run these you must
 
 CLIENT ENCRYPTION:
 The client uses the same 3 AES modes as the server and will send and receive messages from the server. The client will also create a private and public RSA key for signing the 3 modes.
+
+
+PROJECT:
+This project is to show cryptography encryption across a server and client. The private and public keys created by the project are for showing that it works by creating and using said key, it also is to show how the key is made from the server/client.
