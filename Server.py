@@ -1,5 +1,5 @@
 # Robert Gleason and Jacob Sprouse
-# Version 7
+# Version 8
 from Classes import Socket, Cipher, Signature
 from Crypto.PublicKey import RSA
 

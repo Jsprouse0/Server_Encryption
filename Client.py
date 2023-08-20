@@ -1,5 +1,5 @@
 # Robert Gleason and Jacob Sprouse
-# Version 7
+# Version 8
 
 import time
 from Cryptodome.Cipher import AES
