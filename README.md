@@ -11,3 +11,7 @@ This project is to show cryptography encryption across a server and client. The 
 
 NOTE:
 In an actual secure setting, the keys would not be shown; this is for demonstration purposes, so it is easier to understand where the RSA keys are created and pulled from.
+
+THE FILES:
+  -  PEM files are for demonstration of the keys being made and used.
+  -  py files are the code that make a local client and server connection and encrypt messages through RSA and AES
