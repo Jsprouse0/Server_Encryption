@@ -1,12 +1,11 @@
 # Robert Gleason and Jacob Sprouse
-# version 5
+# version 7
 
 import socket
 from Cryptodome.Util.Padding import pad, unpad
 from Cryptodome.Random import get_random_bytes
-from Cryptodome.Cipher import AES
+from Cryptodome.Cipher import AES, PKCS1_OAEP
 from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_OAEP
 
 
 class Socket(object):
@@ -42,7 +41,20 @@ class Cipher(object):
         return cipher_key
 
     @staticmethod
-    def encryption_ecb(cipher_key, message):
+    def encryption_ecb(cipher_key, message, user):
+        try:
+            if user.lower() == 'client':
+                rsa_key_data = RSA.import_key(open("Server_private_key.pem").read()).export_key()
+                rsa_key = RSA.import_key(rsa_key_data)
+            elif user.lower() == 'server':
+                rsa_key_data = RSA.import_key(open("Client_private_key.pem").read()).export_key()
+                rsa_key = RSA.import_key(rsa_key_data)
+            else:
+                raise ValueError("Invalid User.")
+        except ValueError as ve:
+            print("Error:", ve)
+
+        cipher_key = Signature.decrypt_rsa_with_private_key(rsa_key, cipher_key)
         message_bytes = message.encode()
         encryption_cipher = AES.new(cipher_key, AES.MODE_ECB)
         encrypt_ciphertext = encryption_cipher.encrypt(pad(message_bytes, AES.block_size))
@@ -56,7 +68,20 @@ class Cipher(object):
         return received_message
 
     @staticmethod
-    def encryption_cbc(cipher_key, message, iv):
+    def encryption_cbc(cipher_key, message, iv, user):
+        try:
+            if user.lower() == 'client':
+                rsa_key_data = RSA.import_key(open("Server_private_key.pem").read()).export_key()
+                rsa_key = RSA.import_key(rsa_key_data)
+            elif user.lower() == 'server':
+                rsa_key_data = RSA.import_key(open("Client_private_key.pem").read()).export_key()
+                rsa_key = RSA.import_key(rsa_key_data)
+            else:
+                raise ValueError("Invalid User.")
+        except ValueError as ve:
+            print("Error:", ve)
+
+        cipher_key = Signature.decrypt_rsa_with_private_key(rsa_key, cipher_key)
         message_bytes = message.encode()
         encryption_cipher = AES.new(cipher_key, AES.MODE_CBC, iv)
         encrypt_ciphertext = encryption_cipher.encrypt(pad(message_bytes, AES.block_size))
@@ -70,7 +95,20 @@ class Cipher(object):
         return received_message
 
     @staticmethod
-    def encryption_ofb(cipher_key, message, iv):
+    def encryption_ofb(cipher_key, message, iv, user):
+        try:
+            if user.lower() == 'client':
+                rsa_key_data = RSA.import_key(open("Server_private_key.pem").read()).export_key()
+                rsa_key = RSA.import_key(rsa_key_data)
+            elif user.lower() == 'server':
+                rsa_key_data = RSA.import_key(open("Client_private_key.pem").read()).export_key()
+                rsa_key = RSA.import_key(rsa_key_data)
+            else:
+                raise ValueError("Kill Yourself.")
+        except ValueError as ve:
+            print("Error:", ve)
+
+        cipher_key = Signature.decrypt_rsa_with_private_key(rsa_key, cipher_key)
         message_bytes = message.encode()
         encrypt_message = AES.new(cipher_key, AES.MODE_OFB, iv)
         encrypted_cipher_text = encrypt_message.encrypt(message_bytes)
@@ -109,7 +147,13 @@ class Signature(object):
         return public_key
 
     @staticmethod
-    def encrypt_pk(pk, message):
-        pk_cipher = PKCS1_OAEP.new(pk)
-        pk_cipher.encrypt(message)
-        return pk_cipher
+    def encrypt_rsa(public_key, aes_key):
+        rsa_cipher = PKCS1_OAEP.new(public_key)
+        encrypt_rsa_key = rsa_cipher.encrypt(aes_key)
+        return encrypt_rsa_key
+
+    @staticmethod
+    def decrypt_rsa_with_private_key(private_key, encrypt_rsa_key):
+        rsa_cipher = PKCS1_OAEP.new(private_key)
+        decrypt_aes_key = rsa_cipher.decrypt(encrypt_rsa_key)
+        return decrypt_aes_key
